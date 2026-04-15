@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Snake Game</title>
+
+<style>
+    body {
+        text-align: center;
+        font-family: Arial, sans-serif;
+        background-color: #f4e3c1;
+        position: relative;
+    }
+
+    canvas {
+        background-color: white;
+        border: 2px solid black;
+        margin-top: 10px;
+    }
+
+    h1 {
+        color: #8b3a3a;
+    }
+
+    button {
+        margin: 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: #8b3a3a;
+        color: white;
+    }
+
+    button:hover {
+        background-color: #6f2c2c;
+    }
+
+    /* WIN SCREEN */
+    #winScreen {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 3px solid #8b3a3a;
+        padding: 30px;
+        text-align: center;
+        z-index: 10;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Snake Game</h1>
+<h2>Score: <span id="score">0</span></h2>
+
+<button onclick="startGame()">Start</button>
+<button onclick="pauseGame()">Pause / Resume</button>
+<button onclick="restartGame()">Restart</button>
+
+<br>
+
+<canvas id="game" width="400" height="400"></canvas>
+
+<br>
+<a href="js/fromscratch.html">Back to Texas</a>
+
+<!-- WIN SCREEN -->
+<div id="winScreen">
+    <h2>You Win! 🎉</h2>
+    <button onclick="restartGame()">Restart</button>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const box = 20;
+
+let snake, direction, food, score, game;
+let running = false;
+let paused = false;
+
+// setup/reset
+function init() {
+    snake = [{x: 200, y: 200}];
+    direction = "RIGHT";
+    score = 0;
+    document.getElementById("score").innerText = score;
+
+    food = {
+        x: Math.floor(Math.random() * 20) * box,
+        y: Math.floor(Math.random() * 20) * box
+    };
+}
+
+// controls
+document.addEventListener("keydown", function(event) {
+    if (!running) return;
+
+    if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+    else if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+    else if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+    else if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+});
+
+function draw() {
+    if (!running || paused) return;
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, 400, 400);
+
+    // snake
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? "darkgreen" : "green";
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+    }
+
+    // food
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x, food.y, box, box);
+
+    let headX = snake[0].x;
+    let headY = snake[0].y;
+
+    if (direction === "LEFT") headX -= box;
+    if (direction === "RIGHT") headX += box;
+    if (direction === "UP") headY -= box;
+    if (direction === "DOWN") headY += box;
+
+    // eat food
+    if (headX === food.x && headY === food.y) {
+        score++;
+        document.getElementById("score").innerText = score;
+
+        // 🏆 WIN CONDITION
+        if (score >= 10) {
+            clearInterval(game);
+            running = false;
+            document.getElementById("winScreen").style.display = "block";
+            return;
+        }
+
+        food = {
+            x: Math.floor(Math.random() * 20) * box,
+            y: Math.floor(Math.random() * 20) * box
+        };
+    } else {
+        snake.pop();
+    }
+
+    let newHead = {x: headX, y: headY};
+
+    // game over
+    if (
+        headX < 0 || headY < 0 ||
+        headX >= 400 || headY >= 400 ||
+        collision(newHead, snake)
+    ) {
+        clearInterval(game);
+        running = false;
+        alert("Game Over! Score: " + score);
+        return;
+    }
+
+    snake.unshift(newHead);
+}
+
+function collision(head, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (head.x === array[i].x && head.y === array[i].y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// START
+function startGame() {
+    if (running) return;
+
+    init();
+    running = true;
+    paused = false;
+
+    document.getElementById("winScreen").style.display = "none";
+
+    game = setInterval(draw, 120);
+}
+
+// PAUSE / RESUME
+function pauseGame() {
+    if (!running) return;
+    paused = !paused;
+}
+
+// RESTART
+function restartGame() {
+    clearInterval(game);
+    init();
+    running = true;
+    paused = false;
+
+    document.getElementById("winScreen").style.display = "none";
+
+    game = setInterval(draw, 120);
+}
+
+// init on load
+init();
+</script>
+
+</body>
+</html>

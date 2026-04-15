@@ -1,0 +1,40 @@
+body {
+    font-family: "Georgia", serif;
+    color: #2f2f2f;
+    background-color: #fdf6e3;
+}
+
+.header {
+    background-color: #8b3a3a;
+    color: #fff;
+    text-align: center;
+    padding: 25px;
+    font-family: "Georgia", serif;
+}
+
+.main {
+    color: #3b2f2f;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.media {
+    background-color: #f4e3c1;
+    text-align: center;
+    padding: 20px;
+}
+
+.tableauPlaceholder {
+    margin: 0 auto;
+}
+
+.footer {
+    color: #5a4a3f;
+    font-family: "Courier New", monospace;
+    text-align: center;
+    padding: 10px;
+}
+
+a {
+    color: #8b3a3a;
+}
